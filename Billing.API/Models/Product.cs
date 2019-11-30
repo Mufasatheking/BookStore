@@ -14,5 +14,7 @@
         public string Name { get; set; }
 
         public int Price { get; set; }
+
+        public bool isHarryPotter { get; set; }
     }
 }

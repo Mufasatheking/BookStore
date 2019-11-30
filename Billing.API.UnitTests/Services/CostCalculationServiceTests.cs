@@ -195,49 +195,56 @@ namespace Billing.API.UnitTests.Services
                     Id = 1,
                     Name = "Harry Potter Book 1",
                     Price = 10,
-                    SKU = "potter1"
+                    SKU = "potter1",
+                    isHarryPotter = true
                 };
                 var p2 = new Product()
                 {
                     Id = 2,
                     Name = "Harry Potter Book 2",
                     Price = 10,
-                    SKU = "potter2"
+                    SKU = "potter2",
+                    isHarryPotter = true
                 };
                 var p3 = new Product()
                 {
                     Id = 3,
                     Name = "Harry Potter Book 3",
                     Price = 10,
-                    SKU = "potter3"
+                    SKU = "potter3",
+                    isHarryPotter = true
                 };
                 var p4 = new Product()
                 {
                     Id = 4,
                     Name = "Harry Potter Book 4",
                     Price = 10,
-                    SKU = "potter4"
+                    SKU = "potter4",
+                    isHarryPotter = true
                 };
                 var p5 = new Product()
                 {
                     Id = 5,
                     Name = "Harry Potter Book 5",
                     Price = 10,
-                    SKU = "potter5"
+                    SKU = "potter5",
+                    isHarryPotter = true
                 };
                 var p6 = new Product()
                 {
                     Id = 6,
                     Name = "Harry Potter Book 6",
                     Price = 10,
-                    SKU = "potter6"
+                    SKU = "potter6",
+                    isHarryPotter = true
                 };
                 var p7 = new Product()
                 {
                     Id = 7,
                     Name = "Harry Potter Book 7",
                     Price = 10,
-                    SKU = "potter7"
+                    SKU = "potter7",
+                    isHarryPotter = true
                 };
 
                 var potterBooks = new List<Product> { p1, p2, p3, p4, p5, p6, p7 };
