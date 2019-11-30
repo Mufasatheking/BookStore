@@ -8,9 +8,7 @@ namespace Billing.API
     /// </summary>
     public class BillingContext : DbContext
     {
-        public BillingContext() : base() { }
-
-        public BillingContext(DbContextOptions options) : base(options) { }
+        public BillingContext(DbContextOptions<BillingContext> options) : base(options) { }
 
         public DbSet<Product> Products { get; set; }
 

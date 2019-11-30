@@ -1,7 +1,9 @@
-﻿using Billing.API.Services;
+﻿using AutoMapper;
+using Billing.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,9 +24,11 @@ namespace Billing.API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             //TODO: Implement this as an InMemory Database
-            services.AddDbContext<BillingContext>();
+            services.AddDbContext<BillingContext>(options => options.UseInMemoryDatabase(databaseName: "BillingData"));
 
             services.AddTransient<ICostCalculationService, CostCalculationService>();
+            services.AddTransient<IProductsService, ProductsService>();
+            services.AddAutoMapper(typeof(Startup));
 
         }
 

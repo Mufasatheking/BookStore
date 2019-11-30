@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Billing.API.Models
+namespace Billing.API.Models.ViewModels
 {
     /// <summary>
     /// View model for returning the final price information to a Front End.

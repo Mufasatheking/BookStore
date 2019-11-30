@@ -151,7 +151,7 @@ namespace Billing.API.UnitTests.Services
         //    }
         //}
 
-        /* The above test has the wrong logic, this is how it should be */
+        /* The above test has the wrong logic, below is how it should be */
         [Fact]
         public void GivenHarryPotterDiscounts_WhenIPurchase7Potters_ThenThe25DiscountIsAppliedTo5BooksAnd5on2Books()
         {
@@ -220,6 +220,39 @@ namespace Billing.API.UnitTests.Services
             }
         }
 
+        [Fact]
+        public void GivenHarryPotterDiscounts_WhenIPurchase1SomethingElse_ThenNoDiscountIsApplied()
+        {
+            using (var context = new BillingContext(options))
+            {
+                var service = GetService(context);
+
+                var skus = new[] { "somethingelse" };
+
+                var results = service.CalculateCost(skus);
+
+                Assert.Equal(1, results.Count());
+
+                // potter books are not changed
+                var hp1 = results.First(r => r.Product.SKU == "somethingelse");
+                Assert.Equal(10, hp1.FinalPrice);
+            }
+        }
+
+        [Fact]
+        public void WhenSkuNotFound_NoErrorThrown()
+        {
+            using (var context = new BillingContext(options))
+            {
+                var service = GetService(context);
+
+                var skus = new[] { "rickandmorty" };
+
+                var results = service.CalculateCost(skus);
+
+                Assert.Equal(0, results.Count());
+            }
+        }
         private CostCalculationService GetService(BillingContext context)
         {
             return new CostCalculationService(context);

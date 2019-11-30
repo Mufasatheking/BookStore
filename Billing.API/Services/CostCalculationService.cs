@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Billing.API.Models;
 
@@ -26,6 +25,10 @@ namespace Billing.API.Services
 
             var products = GetProducts(productSkus);
             var combos = GetCombos(products);
+            if(combos.Count == 0)
+            {
+                return new List<Purchase>();
+            }
             ComboCost cost = CalculateMinCost(combos);
             List<Purchase> purchases = GetPurchases(cost);
             return purchases;
@@ -38,7 +41,10 @@ namespace Billing.API.Services
             foreach (var sku in productSkus)
             {
                 var prod = context.Products.Where(p => p.SKU == sku).FirstOrDefault();
-                products.Add(prod);
+                if (prod != null)
+                {
+                    products.Add(prod);
+                }
             }
             return products;
         }
@@ -56,6 +62,7 @@ namespace Billing.API.Services
         private List<Group> GetGroupSizes(IEnumerable<Product> products, int maxDistinct)
         {
             var groupSizes = new List<Group>();
+            var ddd = products.ToList();
             var hpList = products.Where(p => p.isHarryPotter).ToList();
             for (int i = hpList.Count(); i > 0; i--)
             {
@@ -92,8 +99,8 @@ namespace Billing.API.Services
                     }
                     else
                     {
-                        var xxx = group.Total * 10 * context.Discounts.Where(q => q.MinProductsRequired == group.Total).Select(q => 1 - q.Percent).FirstOrDefault();
-                        price += xxx;
+                        var cost = group.Total * 10 * context.Discounts.Where(q => q.MinProductsRequired == group.Total).Select(q => 1 - q.Percent).FirstOrDefault();
+                        price += cost;
                     }                    
                 }
 
