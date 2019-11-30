@@ -25,7 +25,7 @@ namespace Billing.API.Controllers
         [HttpGet("cost")]
         public ActionResult<IEnumerable<PurchaseViewModel>> Cost(string[] skus)
         {
-            var results = CostCalculationService.CalculateCost(skus);
+            var purchases = CostCalculationService.CalculateCost(skus);
             throw new NotImplementedException();
         }
 

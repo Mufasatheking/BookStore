@@ -24,49 +24,60 @@ namespace Billing.API.Services
                 return new List<Purchase>();
             }
 
-            var products = new List<Product>();
-            foreach(var sku in productSkus)
-            {
-                var prod = context.Products.Where(p => p.SKU == sku).FirstOrDefault();
-                products.Add(prod);
-            }
-
-            var maxDistinct = productSkus.ToList().Distinct().Count() > 5 ? 5 : productSkus.ToList().Distinct().Count();
-            var allCombos = new List<List<Group>>();
-            for(int i = maxDistinct; i>0; i--)
-            {
-                var groupSizes = getGroupSizes(productSkus, i);
-                allCombos.Add(groupSizes);
-            }
-
-            ComboCost cost = calculateMinCost(allCombos);
+            var products = GetProducts(productSkus);
+            var combos = GetCombos(products);
+            ComboCost cost = CalculateMinCost(combos);
             List<Purchase> purchases = GetPurchases(cost);
             return purchases;
         }
 
-        private List<Group> getGroupSizes(IEnumerable<string> productSkus, int maxDistinct)
+        
+        private List<Product> GetProducts(IEnumerable<string> productSkus)
+        {
+            var products = new List<Product>();
+            foreach (var sku in productSkus)
+            {
+                var prod = context.Products.Where(p => p.SKU == sku).FirstOrDefault();
+                products.Add(prod);
+            }
+            return products;
+        }
+        private List<List<Group>> GetCombos(List<Product> products)
+        {
+            var maxDistinct = products.Distinct().Count() > 5 ? 5 : products.Distinct().Count();
+            var allCombos = new List<List<Group>>();
+            for (int i = maxDistinct; i > 0; i--)
+            {
+                var groupSizes = GetGroupSizes(products, i);
+                allCombos.Add(groupSizes);
+            }
+            return allCombos;
+        }
+        private List<Group> GetGroupSizes(IEnumerable<Product> products, int maxDistinct)
         {
             var groupSizes = new List<Group>();
-            var hpList = productSkus.Where(p => p..ToList();
+            var hpList = products.Where(p => p.isHarryPotter).ToList();
             for (int i = hpList.Count(); i > 0; i--)
             {
                 var distinct = hpList.Distinct().Count();
-                if(distinct == 0)
+                if (distinct == 0)
                 {
                     break;
                 }
                 distinct = distinct > maxDistinct ? distinct = maxDistinct : distinct;
                 var group = hpList.Distinct().Take(distinct).ToList();
-                groupSizes.Add(new Group { Skus = group, Total = group.Count() });
+                groupSizes.Add(new Group { Products = group, Total = group.Count() });
                 foreach (var item in group)
                 {
                     hpList.Remove(item);
                 }
             }
+
+            var nonHpList = products.Where(p => p.isHarryPotter == false).ToList();
+            groupSizes.AddRange(nonHpList.Select(p => new Group { Products = new List<Product> { p }, Total = 1 }).ToList());
             return groupSizes;
         }
-
-        private ComboCost calculateMinCost(List<List<Group>> allCombos)
+        private ComboCost CalculateMinCost(List<List<Group>> allCombos)
         {
             double minPrice = int.MaxValue;
             List<Group> minCombo = null;
@@ -98,7 +109,6 @@ namespace Billing.API.Services
                 Price = minPrice
             };
         }
-
         private List<Purchase> GetPurchases(ComboCost cost)
         {
             List<Purchase> purchases = new List<Purchase>();
@@ -113,27 +123,17 @@ namespace Billing.API.Services
                 {
                     discount = 0;
                 }
-                foreach(var sku in group.Skus)
+                foreach(var product in group.Products)
                 {
                     purchases.Add(new Purchase
                     {
-                        Product = context.Products.Where(p => p.SKU == sku).FirstOrDefault(),
+                        Product = product,
                         Discount = discount
                     });
                 }
             }
             return purchases;
         }
-        public class Group
-        {
-            public List<string> Skus { get; set; }
-            public int Total { get; set; }
-        }
 
-        public class ComboCost
-        {
-            public List<Group> Combo { get; set; }
-            public double Price { get; set; }
-        }
     }
 }

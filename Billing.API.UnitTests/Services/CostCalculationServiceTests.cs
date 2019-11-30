@@ -41,7 +41,6 @@ namespace Billing.API.UnitTests.Services
             }
         }
 
-
         [Fact]
         public void GivenHarryPotterDiscounts_WhenIPurchase5HarryPotterBooks_Then25PercentDiscountIsApplied ()
         {
@@ -129,8 +128,32 @@ namespace Billing.API.UnitTests.Services
             }
         }
 
+        //[Fact]
+        //public void GivenHarryPotterDiscounts_WhenIPurchase7Potters_ThenThe25DiscountIsAppliedTo5Books()
+        //{
+        //    using (var context = new BillingContext(options))
+        //    {
+        //        var service = GetService(context);
+
+        //        var skus = new[] { "potter1", "potter2", "potter3", "potter4", "potter5", "potter6", "potter7" };
+
+        //        var results = service.CalculateCost(skus);
+
+        //        Assert.Equal(7, results.Count());
+
+        //        // 25% discount is applied to 5 books
+        //        var discounted = results.Where(r => r.Discount == 0.25);
+        //        Assert.Equal(5, discounted.Count());
+
+        //        // other books are not discounted
+        //        var noDiscount = results.Where(r => r.Discount == 0);
+        //        Assert.Equal(2, noDiscount.Count());
+        //    }
+        //}
+
+        /* The above test has the wrong logic, this is how it should be */
         [Fact]
-        public void GivenHarryPotterDiscounts_WhenIPurchase7Potters_ThenThe25DiscountIsAppliedTo5Books()
+        public void GivenHarryPotterDiscounts_WhenIPurchase7Potters_ThenThe25DiscountIsAppliedTo5BooksAnd5on2Books()
         {
             using (var context = new BillingContext(options))
             {
@@ -143,15 +166,59 @@ namespace Billing.API.UnitTests.Services
                 Assert.Equal(7, results.Count());
 
                 // 25% discount is applied to 5 books
-                var discounted = results.Where(r => r.Discount == 0.25);
-                Assert.Equal(5, discounted.Count());
+                var discounted25 = results.Where(r => r.Discount == 0.25);
+                Assert.Equal(5, discounted25.Count());
 
-                // other books are not discounted
-                var noDiscount = results.Where(r => r.Discount == 0);
-                Assert.Equal(2, noDiscount.Count());
+                // 5% discount is applied to 2 books
+                var discounted5 = results.Where(r => r.Discount == 0.05);
+                Assert.Equal(2, discounted5.Count());
             }
         }
 
+        // MY OWN TESTS
+        [Fact]
+        public void GivenHarryPotterDiscounts_WhenIPurchase8PottersInCombo22211_ThenThe44ComboDiscountIsApplied()
+        {
+            using (var context = new BillingContext(options))
+            {
+                var service = GetService(context);
+
+                var skus = new[] { "potter1", "potter1", "potter2", "potter2", "potter3", "potter3", "potter6", "potter7" };
+
+                var results = service.CalculateCost(skus);
+
+                Assert.Equal(8, results.Count());
+
+                // 8 books have been discounted
+                var discounted = results.Where(r => r.Discount == 0.20);
+                Assert.Equal(8, discounted.Count());
+
+                // 20% discount is applied to 9 books
+                foreach (var result in results)
+                {
+                    Assert.Equal(8, result.FinalPrice);
+                }
+            }
+        }
+
+        [Fact]
+        public void GivenHarryPotterDiscounts_WhenIPurchase1HarryPotters_ThenNoDiscountIsApplied()
+        {
+            using (var context = new BillingContext(options))
+            {
+                var service = GetService(context);
+
+                var skus = new[] { "potter1" };
+
+                var results = service.CalculateCost(skus);
+
+                Assert.Equal(1, results.Count());
+
+                // potter books are not changed
+                var hp1 = results.First(r => r.Product.SKU == "potter1");
+                Assert.Equal(10, hp1.FinalPrice);
+            }
+        }
 
         private CostCalculationService GetService(BillingContext context)
         {
